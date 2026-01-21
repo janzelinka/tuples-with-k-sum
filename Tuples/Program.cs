@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Collections;
+using System.Net.ServerSentEvents;
+using System.Runtime.InteropServices;
 
 namespace Tuples
 {
@@ -8,7 +10,9 @@ namespace Tuples
         public static void Main(string[] args)
         {
             var result = new List<List<int>>();
-            GetKTuples(_items, 3, 2);
+            //GetKTuples(_items, 3, 2);
+
+            GetAllTuplesWithSum(3);
         }
 
         public static void GetKTuples(
@@ -50,6 +54,32 @@ namespace Tuples
             }
         }
 
+        public class InitStateData
+        {
+            public List<int> TempResult = [];
+            public int Index = 0;
+        }
+
+        public static List<List<int>> GetAllTuplesWithSum(int sum)
+        {
+            var result = new List<List<int>>();
+            var initialState = new InitStateData();
+            Stack<InitStateData> stack = new Stack<InitStateData>();
+            stack.Push(initialState);
+            while (stack.Count > 0)
+            {
+                var item = stack.Pop();
+                if (item.TempResult.Count == 2 && item.TempResult.Sum() == sum)
+                {
+                    result.Add(item.TempResult);
+                }
+                for (var i = item.Index; i < _items.Count; i++)
+                {
+                    stack.Push(new InitStateData { Index = i + 1, TempResult = [.. item.TempResult, _items[i]] });
+                }
+            }
+            return result;
+        }
 
     }
 }
